@@ -154,28 +154,28 @@ function UILib:SetupDrag(dragZone, mainFrame)
 	end)
 end
 
--- Создание окна
+-- Создание окна (1:1 как DarkBlueUtility)
 function UILib:CreateWindow(config)
 	config = config or {}
 	local screenGui = createInstance("ScreenGui", {Name = config.Name or "UILib", Parent = config.Parent or game.Players.LocalPlayer:WaitForChild("PlayerGui"), ZIndexBehavior = Enum.ZIndexBehavior.Sibling})
-	local mainFrame = createInstance("Frame", {Name = "MainFrame", Size = config.Size or UDim2.new(0, 500, 0, 560), Position = config.Position or UDim2.new(0.5, -250, 0.5, -280), BackgroundColor3 = Color3.fromRGB(235, 240, 252), BorderSizePixel = 0, Parent = screenGui})
+	local mainFrame = createInstance("Frame", {Name = "MainFrame", Size = config.Size or UDim2.new(0, 560, 0, 400), Position = config.Position or UDim2.new(0.5, 0, 0.5, 0), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(235, 240, 252), BorderSizePixel = 0, ClipsDescendants = true, Parent = screenGui})
 	applyCorner(mainFrame, 12)
 	
-	local topBar = createInstance("Frame", {Name = "TopBar", Size = UDim2.new(1, 0, 0, 32), BackgroundColor3 = Color3.fromRGB(250, 252, 255), BorderSizePixel = 0, Parent = mainFrame})
+	local topBar = createInstance("Frame", {Name = "TopBar", Size = UDim2.new(1, 0, 0, 32), Position = UDim2.new(0, 0, 0, 0), BackgroundColor3 = Color3.fromRGB(250, 252, 255), BorderSizePixel = 0, ZIndex = 10, Parent = mainFrame})
 	applyCorner(topBar, 12)
 	createInstance("TextLabel", {Name = "Title", Size = UDim2.new(1, -80, 1, 0), Position = UDim2.new(0, 12, 0, 0), BackgroundTransparency = 1, Text = config.Title or "UI", TextColor3 = Color3.fromRGB(40, 50, 70), Font = Enum.Font.GothamBold, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, Parent = topBar})
 	
-	local minimizeButton = createInstance("TextButton", {Name = "MinimizeButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -64, 0.5, -12), BackgroundColor3 = Color3.fromRGB(59, 130, 255), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = "—", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, Parent = topBar})
+	local minimizeButton = createInstance("TextButton", {Name = "MinimizeButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -64, 0.5, -12), BackgroundColor3 = Color3.fromRGB(59, 130, 255), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = "—", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, ZIndex = 11, Parent = topBar})
 	applyCorner(minimizeButton, 6)
-	local closeButton = createInstance("TextButton", {Name = "CloseButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -32, 0.5, -12), BackgroundColor3 = Color3.fromRGB(255, 36, 0), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 20, 0), Text = "X", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, Parent = topBar})
+	local closeButton = createInstance("TextButton", {Name = "CloseButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -32, 0.5, -12), BackgroundColor3 = Color3.fromRGB(255, 36, 0), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 20, 0), Text = "X", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, ZIndex = 11, Parent = topBar})
 	applyCorner(closeButton, 6)
 	
-	local tabBar = createInstance("Frame", {Name = "TabBar", Size = UDim2.new(0, 140, 1, -32), Position = UDim2.new(0, 0, 0, 32), BackgroundColor3 = Color3.fromRGB(242, 246, 255), BorderSizePixel = 0, Parent = mainFrame})
+	local tabBar = createInstance("Frame", {Name = "TabBar", Size = UDim2.new(0, 140, 1, -32), Position = UDim2.new(0, 0, 0, 21), BackgroundColor3 = Color3.fromRGB(242, 246, 255), BorderSizePixel = 0, Parent = mainFrame})
 	applyCorner(tabBar, 0)
 	createInstance("UIListLayout", {FillDirection = Enum.FillDirection.Vertical, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8), Parent = tabBar})
 	createInstance("UIPadding", {PaddingTop = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), PaddingBottom = UDim.new(0, 10), Parent = tabBar})
 	
-	local contentContainer = createInstance("Frame", {Name = "ContentContainer", Size = UDim2.new(1, -140, 1, -32), Position = UDim2.new(0, 140, 0, 32), BackgroundColor3 = Color3.fromRGB(235, 240, 252), BorderSizePixel = 0, Parent = mainFrame})
+	local contentContainer = createInstance("Frame", {Name = "ContentContainer", Size = UDim2.new(1, -140, 1, -32), Position = UDim2.new(0, 140, 0, 36), BackgroundColor3 = Color3.fromRGB(235, 240, 252), BorderSizePixel = 0, Parent = mainFrame})
 	applyCorner(contentContainer, 0)
 	
 	local window = setmetatable({ScreenGui = screenGui, MainFrame = mainFrame, TabBar = tabBar, ContentContainer = contentContainer, Tabs = {}, CurrentTheme = "Light", Settings = {}, Config = config}, UILib)
@@ -211,7 +211,97 @@ function UILib:CreateWindow(config)
 		end)
 	end
 	
+	-- Всегда создаём Settings вкладку
+	window:CreateSettingsTab()
+	
 	return window
+end
+
+-- Создание Settings вкладки (автоматически)
+function UILib:CreateSettingsTab()
+	local settingsTab = self:CreateTab("Settings")
+	settingsTab.LayoutOrder = 999 -- Всегда последняя
+	
+	-- Заголовок Configs
+	settingsTab:CreateLabel("Configs")
+	
+	-- Config textbox
+	local configRow = createInstance("Frame", {Size = UDim2.new(1, 0, 0, 50), BackgroundColor3 = THEMES[self.CurrentTheme].RowGradTop, BorderSizePixel = 0, Parent = settingsTab.Page})
+	applyCorner(configRow, 8)
+	createInstance("UIListLayout", {FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 10), VerticalAlignment = Enum.VerticalAlignment.Center, Parent = configRow})
+	createInstance("UIPadding", {PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), Parent = configRow})
+	createInstance("TextLabel", {Size = UDim2.new(0, 70, 1, 0), BackgroundTransparency = 1, Text = "Config", TextColor3 = THEMES[self.CurrentTheme].ButtonTextColor, Font = Enum.Font.GothamMedium, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1, Parent = configRow})
+	local configTextbox = createInstance("TextBox", {Size = UDim2.new(1, -80, 0, 30), BackgroundColor3 = THEMES[self.CurrentTheme].ButtonBg, BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = self.Settings.Config or "", TextColor3 = THEMES[self.CurrentTheme].ButtonTextColor, PlaceholderColor3 = Color3.fromRGB(140, 150, 175), PlaceholderText = "Enter config...", Font = Enum.Font.Gotham, TextSize = 14, ClearTextOnFocus = false, LayoutOrder = 2, Parent = configRow})
+	applyCorner(configTextbox, 6)
+	configTextbox.FocusLost:Connect(function()
+		self.Settings.Config = configTextbox.Text
+		self:SaveSettings()
+	end)
+	
+	-- Тема
+	local themeRow = createInstance("Frame", {Size = UDim2.new(1, 0, 0, 50), BackgroundColor3 = THEMES[self.CurrentTheme].RowGradTop, BorderSizePixel = 0, Parent = settingsTab.Page})
+	applyCorner(themeRow, 8)
+	createInstance("UIListLayout", {FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 10), VerticalAlignment = Enum.VerticalAlignment.Center, Parent = themeRow})
+	createInstance("UIPadding", {PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), Parent = themeRow})
+	createInstance("TextLabel", {Size = UDim2.new(1, -180, 1, 0), BackgroundTransparency = 1, Text = "Theme", TextColor3 = THEMES[self.CurrentTheme].ButtonTextColor, Font = Enum.Font.GothamMedium, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1, Parent = themeRow})
+	local themeDropdown = createInstance("TextButton", {Size = UDim2.new(0, 170, 0, 30), BackgroundColor3 = THEMES[self.CurrentTheme].ButtonBg, BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = self.Settings.Theme or "Light", TextColor3 = THEMES[self.CurrentTheme].ButtonTextColor, Font = Enum.Font.GothamMedium, TextSize = 14, LayoutOrder = 2, Parent = themeRow})
+	applyCorner(themeDropdown, 6)
+	themeDropdown.MouseButton1Click:Connect(function()
+		local currentText = themeDropdown.Text
+		local currentIndex = table.find(THEME_NAMES, currentText) or 0
+		local nextIndex = (currentIndex % #THEME_NAMES) + 1
+		themeDropdown.Text = THEME_NAMES[nextIndex]
+		self:ApplyTheme(THEME_NAMES[nextIndex])
+	end)
+	
+	-- Меню keybind
+	local menuKeyRow = createInstance("Frame", {Size = UDim2.new(1, 0, 0, 50), BackgroundColor3 = THEMES[self.CurrentTheme].RowGradTop, BorderSizePixel = 0, Parent = settingsTab.Page})
+	applyCorner(menuKeyRow, 8)
+	createInstance("UIListLayout", {FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 10), VerticalAlignment = Enum.VerticalAlignment.Center, Parent = menuKeyRow})
+	createInstance("UIPadding", {PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), Parent = menuKeyRow})
+	createInstance("TextLabel", {Size = UDim2.new(1, -120, 1, 0), BackgroundTransparency = 1, Text = "Menu Key", TextColor3 = THEMES[self.CurrentTheme].ButtonTextColor, Font = Enum.Font.GothamMedium, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, LayoutOrder = 1, Parent = menuKeyRow})
+	local menuKeyButton = createInstance("TextButton", {Size = UDim2.new(0, 110, 0, 30), BackgroundColor3 = THEMES[self.CurrentTheme].ButtonBg, BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = self.Settings.MenuKey or "L", TextColor3 = THEMES[self.CurrentTheme].ButtonTextColor, Font = Enum.Font.GothamMedium, TextSize = 14, LayoutOrder = 2, Parent = menuKeyRow})
+	applyCorner(menuKeyButton, 6)
+	menuKeyButton.MouseButton1Click:Connect(function()
+		menuKeyButton.Text = "Press key..."
+		local conn
+		conn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+			if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard then
+				self.Settings.MenuKey = input.KeyCode.Name
+				menuKeyButton.Text = input.KeyCode.Name
+				self:SaveSettings()
+				conn:Disconnect()
+			end
+		end)
+	end)
+	
+	-- Save/Load кнопки
+	local buttonRow = createInstance("Frame", {Size = UDim2.new(1, 0, 0, 50), BackgroundColor3 = THEMES[self.CurrentTheme].RowGradTop, BorderSizePixel = 0, Parent = settingsTab.Page})
+	applyCorner(buttonRow, 8)
+	createInstance("UIListLayout", {FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 10), VerticalAlignment = Enum.VerticalAlignment.Center, Parent = buttonRow})
+	createInstance("UIPadding", {PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), Parent = buttonRow})
+	local saveButton = createInstance("TextButton", {Size = UDim2.new(0, 100, 0, 30), BackgroundColor3 = THEMES[self.CurrentTheme].ButtonBg, BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = "Save", TextColor3 = THEMES[self.CurrentTheme].ButtonTextColor, Font = Enum.Font.GothamBold, TextSize = 14, LayoutOrder = 1, Parent = buttonRow})
+	applyCorner(saveButton, 6)
+	saveButton.MouseButton1Click:Connect(function()
+		self:SaveSettings()
+		saveButton.Text = "Saved!"
+		task.wait(1)
+		saveButton.Text = "Save"
+	end)
+	local loadButton = createInstance("TextButton", {Size = UDim2.new(0, 100, 0, 30), BackgroundColor3 = THEMES[self.CurrentTheme].ButtonBg, BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = "Load", TextColor3 = THEMES[self.CurrentTheme].ButtonTextColor, Font = Enum.Font.GothamBold, TextSize = 14, LayoutOrder = 2, Parent = buttonRow})
+	applyCorner(loadButton, 6)
+	loadButton.MouseButton1Click:Connect(function()
+		self:LoadSettings()
+		configTextbox.Text = self.Settings.Config or ""
+		themeDropdown.Text = self.Settings.Theme or "Light"
+		menuKeyButton.Text = self.Settings.MenuKey or "L"
+		self:ApplyTheme(self.Settings.Theme or "Light")
+		loadButton.Text = "Loaded!"
+		task.wait(1)
+		loadButton.Text = "Load"
+	end)
+	
+	return settingsTab
 end
 
 -- Создание вкладки
