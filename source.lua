@@ -119,8 +119,8 @@ function UILib:ApplyTheme(themeName)
 	
 	local minimizeBtn = self.MainFrame.TopBar:FindFirstChild("MinimizeButton")
 	local closeBtn = self.MainFrame.TopBar:FindFirstChild("CloseButton")
-	if minimizeBtn then minimizeBtn.BackgroundColor3 = theme.AccentGradTop end
-	if closeBtn then closeBtn.BackgroundColor3 = Color3.fromRGB(255, 36, 0) end
+	if minimizeBtn then minimizeBtn.BackgroundColor3 = theme.AccentGradTop; minimizeBtn.BorderColor3 = theme.AccentGradBottom end
+	if closeBtn then closeBtn.BackgroundColor3 = theme.AccentGradTop; closeBtn.BorderColor3 = theme.AccentGradBottom end
 end
 
 -- Перетаскивание окна
@@ -167,7 +167,7 @@ function UILib:CreateWindow(config)
 	
 	local minimizeButton = createInstance("TextButton", {Name = "MinimizeButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -64, 0.5, -12), BackgroundColor3 = Color3.fromRGB(59, 130, 255), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = "—", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, ZIndex = 11, Parent = topBar})
 	applyCorner(minimizeButton, 6)
-	local closeButton = createInstance("TextButton", {Name = "CloseButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -32, 0.5, -12), BackgroundColor3 = Color3.fromRGB(255, 36, 0), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 20, 0), Text = "X", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, ZIndex = 11, Parent = topBar})
+	local closeButton = createInstance("TextButton", {Name = "CloseButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -32, 0.5, -12), BackgroundColor3 = Color3.fromRGB(59, 130, 255), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = "X", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, ZIndex = 11, Parent = topBar})
 	applyCorner(closeButton, 6)
 	
 	local tabBar = createInstance("Frame", {Name = "TabBar", Size = UDim2.new(0, 140, 1, -32), Position = UDim2.new(0, 0, 0, 21), BackgroundColor3 = Color3.fromRGB(242, 246, 255), BorderSizePixel = 0, Parent = mainFrame})
@@ -203,13 +203,18 @@ function UILib:CreateWindow(config)
 	
 	closeButton.MouseButton1Click:Connect(function() mainFrame.Visible = false end)
 	
-	if config.Keybind then
-		UserInputService.InputBegan:Connect(function(input, gameProcessed)
-			if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode.Name == config.Keybind then
-				mainFrame.Visible = not mainFrame.Visible
-			end
-		end)
+	-- Кейбинд для открытия/закрытия меню
+	local menuKey = config.Keybind or self.Settings.MenuKey or "L"
+	local function updateMenuKey(newKey)
+		menuKey = newKey
 	end
+	window.UpdateMenuKey = updateMenuKey
+	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if gameProcessed then return end
+		if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode.Name == menuKey then
+			mainFrame.Visible = not mainFrame.Visible
+		end
+	end)
 	
 	-- Всегда создаём Settings вкладку
 	window:CreateSettingsTab()
@@ -270,6 +275,7 @@ function UILib:CreateSettingsTab()
 				self.Settings.MenuKey = input.KeyCode.Name
 				menuKeyButton.Text = input.KeyCode.Name
 				self:SaveSettings()
+				if self.UpdateMenuKey then self.UpdateMenuKey(input.KeyCode.Name) end
 				conn:Disconnect()
 			end
 		end)
