@@ -10,33 +10,180 @@ local TweenService = game:GetService("TweenService")
 local UILib = {}
 UILib.__index = UILib
 
--- ТЕМЫ (кратко)
-local THEMES = {}
+-- ТЕМЫ (1:1 как DarkBlueUtility)
+local THEMES = {
+	["Rose"] = {
+		ContainerGradTop = Color3.fromRGB(60, 28, 40),
+		ContainerGradBottom = Color3.fromRGB(45, 18, 28),
+		TabBarGradTop = Color3.fromRGB(70, 35, 48),
+		TabBarGradBottom = Color3.fromRGB(55, 25, 35),
+		TopBarGradTop = Color3.fromRGB(80, 42, 55),
+		TopBarGradBottom = Color3.fromRGB(65, 30, 42),
+		RowGradTop = Color3.fromRGB(80, 42, 55),
+		RowGradBottom = Color3.fromRGB(65, 28, 40),
+		SliderBarGradTop = Color3.fromRGB(90, 50, 65),
+		SliderBarGradBottom = Color3.fromRGB(105, 65, 80),
+		AccentGradTop = Color3.fromRGB(255, 100, 140),
+		AccentGradBottom = Color3.fromRGB(255, 150, 180),
+		ButtonBg = Color3.fromRGB(75, 35, 48),
+		ButtonTextColor = Color3.fromRGB(255, 255, 255),
+		PlaceholderColor = Color3.fromRGB(140, 90, 105),
+	},
+	["Ocean"] = {
+		ContainerGradTop = Color3.fromRGB(18, 48, 76),
+		ContainerGradBottom = Color3.fromRGB(10, 30, 50),
+		TabBarGradTop = Color3.fromRGB(25, 58, 88),
+		TabBarGradBottom = Color3.fromRGB(15, 38, 60),
+		TopBarGradTop = Color3.fromRGB(30, 68, 100),
+		TopBarGradBottom = Color3.fromRGB(20, 45, 70),
+		RowGradTop = Color3.fromRGB(30, 68, 100),
+		RowGradBottom = Color3.fromRGB(22, 48, 74),
+		SliderBarGradTop = Color3.fromRGB(40, 80, 110),
+		SliderBarGradBottom = Color3.fromRGB(55, 95, 125),
+		AccentGradTop = Color3.fromRGB(0, 180, 216),
+		AccentGradBottom = Color3.fromRGB(72, 202, 228),
+		ButtonBg = Color3.fromRGB(28, 55, 78),
+		ButtonTextColor = Color3.fromRGB(255, 255, 255),
+		PlaceholderColor = Color3.fromRGB(100, 130, 150),
+	},
+	["Dark"] = {
+		ContainerGradTop = Color3.fromRGB(20, 28, 48),
+		ContainerGradBottom = Color3.fromRGB(12, 18, 34),
+		TabBarGradTop = Color3.fromRGB(28, 36, 58),
+		TabBarGradBottom = Color3.fromRGB(18, 26, 44),
+		TopBarGradTop = Color3.fromRGB(35, 45, 70),
+		TopBarGradBottom = Color3.fromRGB(22, 30, 50),
+		RowGradTop = Color3.fromRGB(35, 45, 70),
+		RowGradBottom = Color3.fromRGB(25, 33, 53),
+		SliderBarGradTop = Color3.fromRGB(40, 50, 75),
+		SliderBarGradBottom = Color3.fromRGB(55, 65, 90),
+		AccentGradTop = Color3.fromRGB(59, 130, 255),
+		AccentGradBottom = Color3.fromRGB(110, 180, 255),
+		ButtonBg = Color3.fromRGB(38, 43, 56),
+		ButtonTextColor = Color3.fromRGB(255, 255, 255),
+		PlaceholderColor = Color3.fromRGB(100, 110, 130),
+	},
+	["Mint"] = {
+		ContainerGradTop = Color3.fromRGB(225, 250, 242),
+		ContainerGradBottom = Color3.fromRGB(205, 238, 226),
+		TabBarGradTop = Color3.fromRGB(235, 252, 247),
+		TabBarGradBottom = Color3.fromRGB(215, 242, 232),
+		TopBarGradTop = Color3.fromRGB(248, 255, 252),
+		TopBarGradBottom = Color3.fromRGB(228, 245, 237),
+		RowGradTop = Color3.fromRGB(248, 255, 252),
+		RowGradBottom = Color3.fromRGB(228, 245, 237),
+		SliderBarGradTop = Color3.fromRGB(200, 225, 212),
+		SliderBarGradBottom = Color3.fromRGB(218, 238, 228),
+		AccentGradTop = Color3.fromRGB(0, 170, 120),
+		AccentGradBottom = Color3.fromRGB(70, 210, 160),
+		ButtonBg = Color3.fromRGB(230, 248, 240),
+		ButtonTextColor = Color3.fromRGB(25, 60, 45),
+		PlaceholderColor = Color3.fromRGB(120, 150, 135),
+	},
+	["Forest"] = {
+		ContainerGradTop = Color3.fromRGB(28, 50, 38),
+		ContainerGradBottom = Color3.fromRGB(18, 35, 26),
+		TabBarGradTop = Color3.fromRGB(35, 60, 45),
+		TabBarGradBottom = Color3.fromRGB(25, 45, 35),
+		TopBarGradTop = Color3.fromRGB(42, 70, 52),
+		TopBarGradBottom = Color3.fromRGB(30, 50, 38),
+		RowGradTop = Color3.fromRGB(42, 70, 52),
+		RowGradBottom = Color3.fromRGB(32, 55, 42),
+		SliderBarGradTop = Color3.fromRGB(50, 80, 60),
+		SliderBarGradBottom = Color3.fromRGB(65, 95, 75),
+		AccentGradTop = Color3.fromRGB(80, 180, 100),
+		AccentGradBottom = Color3.fromRGB(120, 220, 140),
+		ButtonBg = Color3.fromRGB(45, 65, 52),
+		ButtonTextColor = Color3.fromRGB(255, 255, 255),
+		PlaceholderColor = Color3.fromRGB(110, 130, 118),
+	},
+	["Crimson"] = {
+		ContainerGradTop = Color3.fromRGB(65, 22, 28),
+		ContainerGradBottom = Color3.fromRGB(45, 14, 18),
+		TabBarGradTop = Color3.fromRGB(75, 28, 34),
+		TabBarGradBottom = Color3.fromRGB(55, 18, 24),
+		TopBarGradTop = Color3.fromRGB(85, 34, 40),
+		TopBarGradBottom = Color3.fromRGB(62, 22, 28),
+		RowGradTop = Color3.fromRGB(85, 34, 40),
+		RowGradBottom = Color3.fromRGB(65, 24, 30),
+		SliderBarGradTop = Color3.fromRGB(95, 42, 48),
+		SliderBarGradBottom = Color3.fromRGB(110, 55, 60),
+		AccentGradTop = Color3.fromRGB(220, 40, 55),
+		AccentGradBottom = Color3.fromRGB(255, 90, 100),
+		ButtonBg = Color3.fromRGB(78, 28, 34),
+		ButtonTextColor = Color3.fromRGB(255, 255, 255),
+		PlaceholderColor = Color3.fromRGB(145, 95, 100),
+	},
+	["Coral"] = {
+		ContainerGradTop = Color3.fromRGB(255, 240, 235),
+		ContainerGradBottom = Color3.fromRGB(250, 218, 210),
+		TabBarGradTop = Color3.fromRGB(255, 245, 240),
+		TabBarGradBottom = Color3.fromRGB(250, 225, 218),
+		TopBarGradTop = Color3.fromRGB(255, 250, 247),
+		TopBarGradBottom = Color3.fromRGB(250, 232, 226),
+		RowGradTop = Color3.fromRGB(255, 250, 247),
+		RowGradBottom = Color3.fromRGB(250, 232, 226),
+		SliderBarGradTop = Color3.fromRGB(245, 215, 205),
+		SliderBarGradBottom = Color3.fromRGB(255, 228, 220),
+		AccentGradTop = Color3.fromRGB(255, 95, 85),
+		AccentGradBottom = Color3.fromRGB(255, 150, 130),
+		ButtonBg = Color3.fromRGB(255, 240, 235),
+		ButtonTextColor = Color3.fromRGB(80, 35, 28),
+		PlaceholderColor = Color3.fromRGB(150, 110, 100),
+	},
+	["Lavender"] = {
+		ContainerGradTop = Color3.fromRGB(235, 228, 255),
+		ContainerGradBottom = Color3.fromRGB(218, 208, 245),
+		TabBarGradTop = Color3.fromRGB(242, 237, 255),
+		TabBarGradBottom = Color3.fromRGB(225, 216, 248),
+		TopBarGradTop = Color3.fromRGB(250, 247, 255),
+		TopBarGradBottom = Color3.fromRGB(235, 228, 252),
+		RowGradTop = Color3.fromRGB(250, 247, 255),
+		RowGradBottom = Color3.fromRGB(235, 228, 252),
+		SliderBarGradTop = Color3.fromRGB(215, 205, 240),
+		SliderBarGradBottom = Color3.fromRGB(230, 220, 250),
+		AccentGradTop = Color3.fromRGB(130, 90, 230),
+		AccentGradBottom = Color3.fromRGB(170, 140, 255),
+		ButtonBg = Color3.fromRGB(238, 232, 255),
+		ButtonTextColor = Color3.fromRGB(45, 30, 80),
+		PlaceholderColor = Color3.fromRGB(130, 115, 160),
+	},
+	["Slate"] = {
+		ContainerGradTop = Color3.fromRGB(45, 52, 65),
+		ContainerGradBottom = Color3.fromRGB(32, 38, 48),
+		TabBarGradTop = Color3.fromRGB(52, 60, 74),
+		TabBarGradBottom = Color3.fromRGB(38, 44, 56),
+		TopBarGradTop = Color3.fromRGB(60, 68, 82),
+		TopBarGradBottom = Color3.fromRGB(44, 50, 62),
+		RowGradTop = Color3.fromRGB(60, 68, 82),
+		RowGradBottom = Color3.fromRGB(46, 52, 64),
+		SliderBarGradTop = Color3.fromRGB(70, 78, 92),
+		SliderBarGradBottom = Color3.fromRGB(85, 93, 107),
+		AccentGradTop = Color3.fromRGB(100, 130, 170),
+		AccentGradBottom = Color3.fromRGB(140, 170, 200),
+		ButtonBg = Color3.fromRGB(55, 62, 75),
+		ButtonTextColor = Color3.fromRGB(255, 255, 255),
+		PlaceholderColor = Color3.fromRGB(120, 130, 145),
+	},
+	["Light"] = {
+		ContainerGradTop = Color3.fromRGB(245, 248, 255),
+		ContainerGradBottom = Color3.fromRGB(228, 234, 250),
+		TabBarGradTop = Color3.fromRGB(248, 250, 255),
+		TabBarGradBottom = Color3.fromRGB(235, 240, 252),
+		TopBarGradTop = Color3.fromRGB(255, 255, 255),
+		TopBarGradBottom = Color3.fromRGB(244, 247, 255),
+		RowGradTop = Color3.fromRGB(255, 255, 255),
+		RowGradBottom = Color3.fromRGB(244, 247, 255),
+		SliderBarGradTop = Color3.fromRGB(210, 220, 240),
+		SliderBarGradBottom = Color3.fromRGB(230, 238, 250),
+		AccentGradTop = Color3.fromRGB(59, 130, 255),
+		AccentGradBottom = Color3.fromRGB(110, 180, 255),
+		ButtonBg = Color3.fromRGB(255, 255, 255),
+		ButtonTextColor = Color3.fromRGB(30, 40, 60),
+		PlaceholderColor = Color3.fromRGB(140, 150, 175),
+	},
+}
 local THEME_NAMES = {"Light", "Dark", "Forest", "Rose", "Ocean", "Mint", "Lavender", "Coral", "Slate", "Crimson"}
-
-local function defineTheme(name, c1, c2, tab1, tab2, top1, top2, row1, row2, sl1, sl2, acc1, acc2, btnBg, btnText)
-	THEMES[name] = {
-		ContainerGradTop = Color3.fromRGB(c1), ContainerGradBottom = Color3.fromRGB(c2),
-		TabBarGradTop = Color3.fromRGB(tab1), TabBarGradBottom = Color3.fromRGB(tab2),
-		TopBarGradTop = Color3.fromRGB(top1), TopBarGradBottom = Color3.fromRGB(top2),
-		RowGradTop = Color3.fromRGB(row1), RowGradBottom = Color3.fromRGB(row2),
-		SliderBarGradTop = Color3.fromRGB(sl1), SliderBarGradBottom = Color3.fromRGB(sl2),
-		AccentGradTop = Color3.fromRGB(acc1), AccentGradBottom = Color3.fromRGB(acc2),
-		ButtonBg = Color3.fromRGB(btnBg), ButtonTextColor = Color3.fromRGB(btnText),
-	}
-end
-
-defineTheme("Light", 245, 248, 255, 228, 234, 250, 248, 250, 255, 235, 240, 252, 255, 255, 255, 244, 247, 255, 255, 255, 255, 244, 247, 255, 210, 220, 240, 230, 238, 250, 59, 130, 255, 110, 180, 255, 255, 255, 255, 30, 40, 60)
-defineTheme("Dark", 20, 28, 48, 12, 18, 34, 28, 36, 58, 18, 26, 44, 35, 45, 70, 22, 30, 50, 35, 45, 70, 25, 33, 53, 40, 50, 75, 55, 65, 90, 59, 130, 255, 110, 180, 255, 38, 43, 56, 255, 255, 255)
-defineTheme("Forest", 28, 50, 38, 18, 35, 26, 35, 60, 45, 25, 45, 35, 42, 70, 52, 30, 50, 38, 42, 70, 52, 32, 55, 42, 50, 80, 60, 65, 95, 75, 80, 180, 100, 120, 220, 140, 45, 65, 52, 255, 255, 255)
-defineTheme("Rose", 60, 28, 40, 45, 18, 28, 70, 35, 48, 55, 25, 35, 80, 42, 55, 65, 30, 42, 80, 42, 55, 65, 28, 40, 90, 50, 65, 105, 65, 80, 255, 100, 140, 255, 150, 180, 75, 35, 48, 255, 255, 255)
-defineTheme("Ocean", 18, 48, 76, 10, 30, 50, 25, 58, 88, 15, 38, 60, 30, 68, 100, 20, 45, 70, 30, 68, 100, 22, 48, 74, 40, 80, 110, 55, 95, 125, 0, 180, 216, 72, 202, 228, 28, 55, 78, 255, 255, 255)
-defineTheme("Mint", 225, 250, 242, 205, 238, 226, 235, 252, 247, 215, 242, 232, 248, 255, 252, 228, 245, 237, 248, 255, 252, 228, 245, 237, 200, 225, 212, 218, 238, 228, 0, 170, 120, 70, 210, 160, 230, 248, 240, 25, 60, 45)
-defineTheme("Lavender", 235, 228, 255, 218, 208, 245, 242, 237, 255, 225, 216, 248, 250, 247, 255, 235, 228, 252, 250, 247, 255, 235, 228, 252, 215, 205, 240, 230, 220, 250, 130, 90, 230, 170, 140, 255, 238, 232, 255, 45, 30, 80)
-defineTheme("Coral", 255, 240, 235, 250, 218, 210, 255, 245, 240, 250, 225, 218, 255, 250, 247, 250, 232, 226, 255, 250, 247, 250, 232, 226, 245, 215, 205, 255, 228, 220, 255, 95, 85, 255, 150, 130, 255, 240, 235, 80, 35, 28)
-defineTheme("Slate", 45, 52, 65, 32, 38, 48, 52, 60, 74, 38, 44, 56, 60, 68, 82, 44, 50, 62, 60, 68, 82, 46, 52, 64, 70, 78, 92, 85, 93, 107, 100, 130, 170, 140, 170, 200, 55, 62, 75, 255, 255, 255)
-defineTheme("Crimson", 65, 22, 28, 45, 14, 18, 75, 28, 34, 55, 18, 24, 85, 34, 40, 62, 22, 28, 85, 34, 40, 65, 24, 30, 95, 42, 48, 110, 55, 60, 220, 40, 55, 255, 90, 100, 78, 28, 34, 255, 255, 255)
-
 -- Вспомогательные функции
 local function createInstance(className, props)
 	local inst = Instance.new(className)
@@ -157,7 +304,15 @@ end
 -- Создание окна (1:1 как DarkBlueUtility)
 function UILib:CreateWindow(config)
 	config = config or {}
-	local screenGui = createInstance("ScreenGui", {Name = config.Name or "UILib", Parent = config.Parent or game.Players.LocalPlayer:WaitForChild("PlayerGui"), ZIndexBehavior = Enum.ZIndexBehavior.Sibling})
+	local parent = config.Parent
+	if not parent then
+		if game.Players.LocalPlayer then
+			parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+		else
+			parent = game.StarterGui
+		end
+	end
+	local screenGui = createInstance("ScreenGui", {Name = config.Name or "UILib", Parent = parent, ZIndexBehavior = Enum.ZIndexBehavior.Sibling})
 	local mainFrame = createInstance("Frame", {Name = "MainFrame", Size = config.Size or UDim2.new(0, 560, 0, 400), Position = config.Position or UDim2.new(0.5, 0, 0.5, 0), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(235, 240, 252), BorderSizePixel = 0, ClipsDescendants = true, Parent = screenGui})
 	applyCorner(mainFrame, 12)
 	
