@@ -207,10 +207,10 @@ end
 -- Сохранение настроек
 function UILib:SaveSettings()
 	if self.Config.SaveSettings == false then return end
-	local settingsFolder = game.ReplicatedStorage:FindFirstChild("UILibSettings_" .. self.Config.Name)
+	local settingsFolder = game.ReplicatedStorage:FindFirstChild("UILibSettings_" .. (self.Config and self.Config.Name or "UILib"))
 	if not settingsFolder then
 		settingsFolder = Instance.new("Folder")
-		settingsFolder.Name = "UILibSettings_" .. self.Config.Name
+		settingsFolder.Name = "UILibSettings_" .. (self.Config and self.Config.Name or "UILib")
 		settingsFolder.Parent = game.ReplicatedStorage
 	end
 	for k, v in pairs(self.Settings) do
@@ -220,7 +220,7 @@ end
 
 function UILib:LoadSettings()
 	if self.Config.SaveSettings == false then return end
-	local settingsFolder = game.ReplicatedStorage:FindFirstChild("UILibSettings_" .. self.Config.Name)
+	local settingsFolder = game.ReplicatedStorage:FindFirstChild("UILibSettings_" .. (self.Config and self.Config.Name or "UILib"))
 	if settingsFolder then
 		for _, attr in ipairs(settingsFolder:GetAttributes()) do
 			self.Settings[attr] = settingsFolder:GetAttribute(attr)
@@ -359,7 +359,7 @@ function UILib:CreateWindow(config)
 	closeButton.MouseButton1Click:Connect(function() mainFrame.Visible = false end)
 	
 	-- Кейбинд для открытия/закрытия меню
-	local menuKey = config.Keybind or self.Settings.MenuKey or "L"
+	local menuKey = config.Keybind or window.Settings.MenuKey or "L"
 	local function updateMenuKey(newKey)
 		menuKey = newKey
 	end
