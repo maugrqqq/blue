@@ -252,7 +252,7 @@ function UILib:ApplyTheme(themeName)
 					if desc.Name == "SliderBar" then
 						applyGradient(desc, theme.SliderBarGradTop, theme.SliderBarGradBottom)
 					else
-						applyGradient(desc, theme.RowGradTop, theme.RowGradBottom)
+						applyGradient(desc, theme.RowGradTop, theme.RowGradBottom, 180)
 					end
 				end
 			elseif desc:IsA("TextButton") or desc:IsA("TextBox") then
@@ -266,8 +266,8 @@ function UILib:ApplyTheme(themeName)
 	
 	local minimizeBtn = self.MainFrame.TopBar:FindFirstChild("MinimizeButton")
 	local closeBtn = self.MainFrame.TopBar:FindFirstChild("CloseButton")
-	if minimizeBtn then minimizeBtn.BackgroundColor3 = theme.AccentGradTop; minimizeBtn.BorderColor3 = theme.AccentGradBottom end
-	if closeBtn then closeBtn.BackgroundColor3 = theme.AccentGradTop; closeBtn.BorderColor3 = theme.AccentGradBottom end
+	if minimizeBtn then minimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 193, 7); minimizeBtn.BorderColor3 = Color3.fromRGB(180, 140, 0) end
+	if closeBtn then closeBtn.BackgroundColor3 = Color3.fromRGB(255, 36, 0); closeBtn.BorderColor3 = Color3.fromRGB(180, 20, 0) end
 end
 
 -- Перетаскивание окна
@@ -318,14 +318,14 @@ function UILib:CreateWindow(config)
 	
 	local topBar = createInstance("Frame", {Name = "TopBar", Size = UDim2.new(1, 0, 0, 32), Position = UDim2.new(0, 0, 0, 0), BackgroundColor3 = Color3.fromRGB(250, 252, 255), BorderSizePixel = 0, ZIndex = 10, Parent = mainFrame})
 	applyCorner(topBar, 12)
-	createInstance("TextLabel", {Name = "Title", Size = UDim2.new(1, -80, 1, 0), Position = UDim2.new(0, 12, 0, 0), BackgroundTransparency = 1, Text = config.Title or "UI", TextColor3 = Color3.fromRGB(40, 50, 70), Font = Enum.Font.GothamBold, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, Parent = topBar})
+	createInstance("TextLabel", {Name = "Title", Size = UDim2.new(1, -80, 1, 0), Position = UDim2.new(0, 12, 0, 0), BackgroundTransparency = 1, BackgroundColor3 = Color3.fromRGB(255, 255, 255), Text = config.Title or "UI", TextColor3 = Color3.fromRGB(40, 50, 70), Font = Enum.Font.GothamBold, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 11, Parent = topBar})
 	
-	local minimizeButton = createInstance("TextButton", {Name = "MinimizeButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -64, 0.5, -12), BackgroundColor3 = Color3.fromRGB(59, 130, 255), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = "—", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, ZIndex = 11, Parent = topBar})
+	local minimizeButton = createInstance("TextButton", {Name = "MinimizeButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -64, 0.5, -12), BackgroundColor3 = Color3.fromRGB(255, 193, 7), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 140, 0), Text = "—", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, ZIndex = 11, Parent = topBar})
 	applyCorner(minimizeButton, 6)
-	local closeButton = createInstance("TextButton", {Name = "CloseButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -32, 0.5, -12), BackgroundColor3 = Color3.fromRGB(59, 130, 255), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 192, 220), Text = "X", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, ZIndex = 11, Parent = topBar})
+	local closeButton = createInstance("TextButton", {Name = "CloseButton", Size = UDim2.new(0, 28, 0, 24), Position = UDim2.new(1, -32, 0.5, -12), BackgroundColor3 = Color3.fromRGB(255, 36, 0), BorderSizePixel = 1, BorderColor3 = Color3.fromRGB(180, 20, 0), Text = "X", TextColor3 = Color3.fromRGB(255, 255, 255), Font = Enum.Font.Gotham, TextSize = 14, ZIndex = 11, Parent = topBar})
 	applyCorner(closeButton, 6)
 	
-	local tabBar = createInstance("Frame", {Name = "TabBar", Size = UDim2.new(0, 140, 1, -32), Position = UDim2.new(0, 0, 0, 21), BackgroundColor3 = Color3.fromRGB(242, 246, 255), BorderSizePixel = 0, Parent = mainFrame})
+	local tabBar = createInstance("Frame", {Name = "TabBar", Size = UDim2.new(-0.0357142873, 140, 1.02750003, -32), Position = UDim2.new(0, 0, 0, 21), BackgroundColor3 = Color3.fromRGB(242, 246, 255), BorderSizePixel = 0, Parent = mainFrame})
 	applyCorner(tabBar, 0)
 	createInstance("UIListLayout", {FillDirection = Enum.FillDirection.Vertical, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8), Parent = tabBar})
 	createInstance("UIPadding", {PaddingTop = UDim.new(0, 10), PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), PaddingBottom = UDim.new(0, 10), Parent = tabBar})
@@ -462,6 +462,7 @@ function UILib:CreateSettingsTab()
 		loadButton.Text = "Load"
 	end)
 	
+	self:ApplyTheme(self.CurrentTheme)
 	return settingsTab
 end
 
