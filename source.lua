@@ -1,3 +1,13 @@
+--[[
+	DarkBlueUtility UI Library v2.0
+	Reusable UI constructor library
+	Usage:
+	local UI = loadstring(game:HttpGet("https://github.com/ui/ui/source.lua"))()
+	local Window = UI:CreateWindow({ Title = "Window Title", MinimizeKey = Enum.KeyCode.LeftControl })
+	local Tab = Window:AddTab({ Title = "Main" })
+	local Toggle = Tab:AddToggle({ Title = "Auto Hatch Eggs" })
+]]
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
