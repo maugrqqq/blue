@@ -1283,6 +1283,8 @@ function Window:_createSection(tab, sectionData)
 	local section = {}
 	section.Type = "Section"
 	section.Title = sectionData.Title or "Section"
+	section.Window = self
+	section.Tab = tab
 	section.Connections = {}
 
 	local titleButton = createElement("TextButton", {
@@ -1329,37 +1331,37 @@ function Window:_createSection(tab, sectionData)
 	table.insert(section.Connections, clickConn)
 
 	function section:AddToggle(toggleData)
-		local toggle = self.Window:_createToggle(tab, toggleData)
+		local toggle = section.Window:_createToggle(section.Tab, toggleData)
 		table.insert(rows, toggle.Row)
 		return toggle
 	end
 	function section:AddButton(buttonData)
-		local button = self.Window:_createButton(tab, buttonData)
+		local button = section.Window:_createButton(section.Tab, buttonData)
 		table.insert(rows, button.Row)
 		return button
 	end
 	function section:AddSlider(sliderData)
-		local slider = self.Window:_createSlider(tab, sliderData)
+		local slider = section.Window:_createSlider(section.Tab, sliderData)
 		table.insert(rows, slider.Row)
 		return slider
 	end
 	function section:AddDropdown(dropdownData)
-		local dropdown = self.Window:_createDropdown(tab, dropdownData)
+		local dropdown = section.Window:_createDropdown(section.Tab, dropdownData)
 		table.insert(rows, dropdown.Row)
 		return dropdown
 	end
 	function section:AddMultiDropdown(dropdownData)
-		local dropdown = self.Window:_createMultiDropdown(tab, dropdownData)
+		local dropdown = section.Window:_createMultiDropdown(section.Tab, dropdownData)
 		table.insert(rows, dropdown.Row)
 		return dropdown
 	end
 	function section:AddTextbox(textboxData)
-		local textbox = self.Window:_createTextbox(tab, textboxData)
+		local textbox = section.Window:_createTextbox(section.Tab, textboxData)
 		table.insert(rows, textbox.Row)
 		return textbox
 	end
 	function section:AddKeybind(keybindData)
-		local keybind = self.Window:_createKeybind(tab, keybindData)
+		local keybind = section.Window:_createKeybind(section.Tab, keybindData)
 		table.insert(rows, keybind.Row)
 		return keybind
 	end
