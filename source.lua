@@ -376,7 +376,7 @@ end
 function Window:_createRow(tab, name)
 	local row = createElement("Frame", {
 		Name = name,
-		Size = UDim2.new(1, -24, 0, 50),
+		Size = UDim2.new(0.95, 0, 0, 50),
 		BackgroundColor3 = Library.Theme.Row,
 		BorderSizePixel = 0,
 		Parent = tab.Container,
