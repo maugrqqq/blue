@@ -290,7 +290,7 @@ function Window:_createTab(tabData)
 		Visible = false,
 		Parent = self.ContentFrame,
 	})
-	addListLayout(tab.Container, 5, Enum.FillDirection.Vertical)
+	addListLayout(tab.Container, 5, Enum.FillDirection.Vertical, Enum.VerticalAlignment.Top, Enum.HorizontalAlignment.Center)
 
 	local tabFrame = createElement("Frame", {
 		Name = tab.Title .. "TabFrame",
@@ -377,8 +377,6 @@ function Window:_createRow(tab, name)
 	local row = createElement("Frame", {
 		Name = name,
 		Size = UDim2.new(1, -24, 0, 50),
-		Position = UDim2.new(0.5, 0, 0, 0),
-		AnchorPoint = Vector2.new(0.5, 0),
 		BackgroundColor3 = Library.Theme.Row,
 		BorderSizePixel = 0,
 		Parent = tab.Container,
