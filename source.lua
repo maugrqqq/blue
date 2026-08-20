@@ -149,12 +149,16 @@ end
 function Window:_showWithAnimation()
 	self.MainFrame.Visible = true
 	self:_restoreOriginalColors()
+	
+	local targetPosition = self.LastPosition or UDim2.new(0.5, -self.Width/2, 0.5, -self.Height/2)
+	
 	self.MainFrame.Size = UDim2.fromOffset(0, 0)
-	self.MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	self.MainFrame.Position = UDim2.new(targetPosition.X.Scale, targetPosition.X.Offset + self.Width/2, targetPosition.Y.Scale, targetPosition.Y.Offset + self.Height/2)
+	
 	local tween = TweenService:Create(
 		self.MainFrame,
 		TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-		{Size = UDim2.fromOffset(self.Width, self.Height), Position = UDim2.new(0.5, -self.Width/2, 0.5, -self.Height/2)}
+		{Size = UDim2.fromOffset(self.Width, self.Height), Position = targetPosition}
 	)
 	tween:Play()
 end
@@ -163,6 +167,8 @@ function Window:_hideWithAnimation()
 	if self.SlideTween then self.SlideTween:Cancel() end
 	if self.MinimizeTween then self.MinimizeTween:Cancel() end
 	if self.RestoreTween then self.RestoreTween:Cancel() end
+
+	self.LastPosition = self.MainFrame.Position
 
 	local fadeElements = {self.MainFrame, self.MinimizedBar, self.TopBarFrame, self.ContentFrame, self.TabBarFrame}
 	for _, element in ipairs(fadeElements) do
@@ -729,6 +735,8 @@ function Window:_createDropdown(tab, dropdownData)
 	dropdown.Connections = {}
 	dropdown.IsOpen = false
 	dropdown.DropdownGui = nil
+	dropdown.FavoriteOptions = {}
+	dropdown.FavoriteOrder = {}
 
 	local row = self:_createRow(tab, dropdown.Title .. "Row")
 	local label = createElement("TextLabel", {
@@ -781,6 +789,98 @@ function Window:_createDropdown(tab, dropdownData)
 		end
 	end
 
+	local function renderOptions(optionsScroll, searchText)
+		for _, child in ipairs(optionsScroll:GetChildren()) do
+			if child:IsA("Frame") and child.Name == "OptionContainer" then
+				child:Destroy()
+			end
+		end
+
+		local sortedOptions = {}
+		for i = #dropdown.FavoriteOrder, 1, -1 do
+			local opt = dropdown.FavoriteOrder[i]
+			if dropdown.FavoriteOptions[opt] then
+				table.insert(sortedOptions, opt)
+			end
+		end
+		for _, opt in ipairs(dropdown.Options) do
+			if not dropdown.FavoriteOptions[opt] then
+				table.insert(sortedOptions, opt)
+			end
+		end
+
+		local searchLower = searchText and searchText:lower() or ""
+		local filteredOptions = {}
+		for _, opt in ipairs(sortedOptions) do
+			if searchLower == "" or string.find(opt:lower(), searchLower, 1, true) then
+				table.insert(filteredOptions, opt)
+			end
+		end
+
+		local layoutOrder = 2
+		for _, option in ipairs(filteredOptions) do
+			local optionContainer = createElement("Frame", {
+				Name = "OptionContainer",
+				Size = UDim2.new(1, 0, 0, 30),
+				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+				BorderSizePixel = 0,
+				LayoutOrder = layoutOrder,
+				Parent = optionsScroll,
+			})
+			layoutOrder = layoutOrder + 1
+
+			local optionButton = createElement("TextButton", {
+				Name = "OptionButton",
+				Text = option,
+				Font = Library.Theme.Font,
+				TextSize = 14,
+				TextColor3 = dropdown.FavoriteOptions[option] and Library.Theme.Accent or Library.Theme.Text,
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+				BorderSizePixel = 0,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Parent = optionContainer,
+			})
+			addCorner(optionButton, {0, 8})
+			addPadding(optionButton, 0, 0, 8, 8)
+
+			optionButton.MouseButton1Click:Connect(function()
+				dropdown:SetValue(option)
+				closeDropdown(true)
+			end)
+
+			optionButton.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton3 then
+					dropdown.FavoriteOptions[option] = not dropdown.FavoriteOptions[option]
+					if dropdown.FavoriteOptions[option] then
+						for i = #dropdown.FavoriteOrder, 1, -1 do
+							if dropdown.FavoriteOrder[i] == option then
+								table.remove(dropdown.FavoriteOrder, i)
+							end
+						end
+						table.insert(dropdown.FavoriteOrder, option)
+					else
+						for i = #dropdown.FavoriteOrder, 1, -1 do
+							if dropdown.FavoriteOrder[i] == option then
+								table.remove(dropdown.FavoriteOrder, i)
+							end
+						end
+					end
+					renderOptions(optionsScroll, searchText)
+				end
+			end)
+
+			optionButton.MouseEnter:Connect(function()
+				optionContainer.BackgroundColor3 = Library.Theme.Row
+				optionButton.BackgroundColor3 = Library.Theme.Row
+			end)
+			optionButton.MouseLeave:Connect(function()
+				optionContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				optionButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			end)
+		end
+	end
+
 	local function openDropdown()
 		if dropdown.IsOpen then
 			closeDropdown(true)
@@ -810,10 +910,28 @@ function Window:_createDropdown(tab, dropdownData)
 		})
 		addCorner(listFrame, {0, 8})
 
+		local searchBox = createElement("TextBox", {
+			Name = "SearchBox",
+			PlaceholderText = "Type to search",
+			Text = "Tap to search",
+			Font = Library.Theme.Font,
+			TextSize = 13,
+			TextColor3 = Library.Theme.Text,
+			PlaceholderColor3 = Library.Theme.TextDim,
+			Size = UDim2.new(1, -8, 0, 28),
+			Position = UDim2.new(0, 4, 0, 4),
+			BackgroundColor3 = Library.Theme.Row,
+			BorderSizePixel = 0,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Parent = listFrame,
+		})
+		addCorner(searchBox, {0, 4})
+		addPadding(searchBox, 0, 0, 8, 8)
+
 		local optionsScroll = createElement("ScrollingFrame", {
 			Name = "OptionsScroll",
 			Size = UDim2.new(1, -8, 0, 170),
-			Position = UDim2.new(0, 4, 0, 4),
+			Position = UDim2.new(0, 4, 0, 36),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			ScrollingDirection = Enum.ScrollingDirection.Y,
@@ -824,39 +942,31 @@ function Window:_createDropdown(tab, dropdownData)
 		})
 		addListLayout(optionsScroll, 4, Enum.FillDirection.Vertical)
 
-		local targetHeight = 170 + 8
+		local hintLabel = createElement("TextLabel", {
+			Name = "HintLabel",
+			Text = "Middle click to Favorite!",
+			Font = Library.Theme.Font,
+			TextSize = 10,
+			TextColor3 = Library.Theme.TextDim,
+			Size = UDim2.new(1, -8, 0, 14),
+			Position = UDim2.new(0, 4, 0, 36 + 170 + 2),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			Parent = listFrame,
+		})
+
+		local currentSearch = ""
+		searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+			currentSearch = searchBox.Text
+			renderOptions(optionsScroll, currentSearch)
+		end)
+
+		renderOptions(optionsScroll, currentSearch)
+
+		local targetHeight = 36 + 170 + 8 + 16
 		local openTween = TweenService:Create(listFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.fromOffset(btn.AbsoluteSize.X, targetHeight)})
 		openTween:Play()
-
-		for i, option in ipairs(dropdown.Options) do
-			local optionButton = createElement("TextButton", {
-				Name = "OptionButton",
-				Text = option,
-				Font = Library.Theme.Font,
-				TextSize = 14,
-				TextColor3 = Library.Theme.Text,
-				Size = UDim2.new(1, 0, 0, 30),
-				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-				BorderSizePixel = 0,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				Parent = optionsScroll,
-				LayoutOrder = i,
-			})
-			addCorner(optionButton, {0, 8})
-			addPadding(optionButton, 0, 0, 8, 8)
-
-			optionButton.MouseButton1Click:Connect(function()
-				dropdown:SetValue(option)
-				closeDropdown(true)
-			end)
-
-			optionButton.MouseEnter:Connect(function()
-				optionButton.BackgroundColor3 = Library.Theme.Row
-			end)
-			optionButton.MouseLeave:Connect(function()
-				optionButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			end)
-		end
 	end
 
 	btn.MouseButton1Click:Connect(openDropdown)
@@ -1405,6 +1515,7 @@ function Library:CreateWindow(windowData)
 	self.MinimizeTween = nil
 	self.RestoreTween = nil
 	self.OriginalColors = {}
+	self.LastPosition = nil
 
 	-- Main frame
 	self.MainFrame = createElement("Frame", {
