@@ -361,8 +361,8 @@ function Window:_selectTab(tab)
 		t.Button.BackgroundTransparency = 0
 	end
 	tab.Container.Visible = true
-	tab.Button.BackgroundColor3 = Library.Theme.Accent
-	tab.Button.BackgroundTransparency = 0.1
+	tab.Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	tab.Button.BackgroundTransparency = 0
 	self.CurrentTab = tab
 end
 
