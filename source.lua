@@ -1400,7 +1400,6 @@ function Window:_createSection(tab, sectionData)
 
 	local titleButton = createElement("TextButton", {
 		Text = section.Title .. "     ▼",
-		Font = Library.Theme.Font,
 		TextSize = 14,
 		FontFace = Font.fromName(Library.Theme.Font, Enum.FontWeight.Bold),
 		TextColor3 = Library.Theme.Text,
