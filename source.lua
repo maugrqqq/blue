@@ -377,7 +377,6 @@ function Window:_createRow(tab, name)
 	local row = createElement("Frame", {
 		Name = name,
 		Size = UDim2.new(1, 0, 0, 50),
-		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = Library.Theme.Row,
 		BorderSizePixel = 0,
 		Parent = tab.Container,
@@ -385,7 +384,7 @@ function Window:_createRow(tab, name)
 	addCorner(row, {0, 8})
 	addGradient(row, Library.Theme.RowGradientTop, Library.Theme.RowGradientBottom, 180)
 	addListLayout(row, 10, Enum.FillDirection.Horizontal, Enum.VerticalAlignment.Center)
-	addPadding(row, 10, 10, 10, 10)
+	addPadding(row, 0, 0, 10, 10)
 	return row
 end
 
