@@ -384,7 +384,7 @@ function Window:_createRow(tab, name)
 	addCorner(row, {0, 8})
 	addGradient(row, Library.Theme.RowGradientTop, Library.Theme.RowGradientBottom, 180)
 	addListLayout(row, 10, Enum.FillDirection.Horizontal, Enum.VerticalAlignment.Center)
-	addPadding(row, 0, 0, 10, 10)
+	addPadding(row, 5, 5, 12, 12)
 	return row
 end
 
