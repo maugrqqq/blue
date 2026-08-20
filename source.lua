@@ -291,7 +291,7 @@ function Window:_createTab(tabData)
 		Parent = self.ContentFrame,
 	})
 	addListLayout(tab.Container, 5, Enum.FillDirection.Vertical, Enum.VerticalAlignment.Top, Enum.HorizontalAlignment.Left)
-	addPadding(tab.Container, 10, 10, 12, 12)
+	addPadding(tab.Container, 10, 10, 0, 12)
 
 	local tabFrame = createElement("Frame", {
 		Name = tab.Title .. "TabFrame",
