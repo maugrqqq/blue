@@ -94,6 +94,96 @@ local function createElement(className, props)
 	return element
 end
 
+
+-- ==================== SETTINGS / CONFIG SYSTEM ====================
+local SettingsFolderName = "UILibrarySettings"
+local ConfigsFolderName = "UILibraryConfigs"
+
+local function getSettingsFolder()
+	local folder = game.ServerStorage:FindFirstChild(SettingsFolderName)
+	if not folder then
+		folder = Instance.new("Folder")
+		folder.Name = SettingsFolderName
+		folder.Parent = game.ServerStorage
+	end
+	return folder
+end
+
+local function getConfigsFolder()
+	local folder = game.ServerStorage:FindFirstChild(ConfigsFolderName)
+	if not folder then
+		folder = Instance.new("Folder")
+		folder.Name = ConfigsFolderName
+		folder.Parent = game.ServerStorage
+	end
+	return folder
+end
+
+function Library:GetSettingsFolder()
+	return getSettingsFolder()
+end
+
+function Library:GetConfigsFolder()
+	return getConfigsFolder()
+end
+
+function Library:GetConfigNames()
+	local names = {}
+	for _, child in ipairs(getConfigsFolder():GetChildren()) do
+		if child:IsA("Folder") then table.insert(names, child.Name) end
+	end
+	table.sort(names)
+	return names
+end
+
+function Library:SaveSettings(settings)
+	settings = settings or {}
+	for k, v in pairs(settings) do getSettingsFolder():SetAttribute(k, v) end
+end
+
+function Library:LoadSettings()
+	local out = {}
+	for _, attr in ipairs(getSettingsFolder():GetAttributes()) do out[attr] = getSettingsFolder():GetAttribute(attr) end
+	return out
+end
+
+function Library:SaveConfig(name, settings)
+	if not name or name == "" then return false end
+	local cf = getConfigsFolder():FindFirstChild(name)
+	if not cf then
+		cf = Instance.new("Folder")
+		cf.Name = name
+		cf.Parent = getConfigsFolder()
+	end
+	for k, v in pairs(settings or {}) do cf:SetAttribute(k, v) end
+	return true
+end
+
+function Library:DeleteConfig(name)
+	local cf = getConfigsFolder():FindFirstChild(name)
+	if not cf then return false end
+	if getSettingsFolder():GetAttribute("AutoloadConfig") == name then getSettingsFolder():SetAttribute("AutoloadConfig", nil) end
+	cf:Destroy()
+	return true
+end
+
+function Library:SetAutoload(name)
+	if name and name ~= "" then getSettingsFolder():SetAttribute("AutoloadConfig", name) else getSettingsFolder():SetAttribute("AutoloadConfig", nil) end
+end
+
+function Library:GetAutoload()
+	return getSettingsFolder():GetAttribute("AutoloadConfig")
+end
+
+function Library:LoadConfig(name)
+	local cf = getConfigsFolder():FindFirstChild(name)
+	if not cf then return false end
+	local out = {}
+	for _, attr in ipairs(cf:GetAttributes()) do out[attr] = cf:GetAttribute(attr) end
+	for k, v in pairs(out) do getSettingsFolder():SetAttribute(k, v) end
+	return out
+end
+
 -- ==================== WINDOW ====================
 local Window = {}
 Window.__index = Window
@@ -490,7 +580,9 @@ function Window:_createToggle(tab, toggleData)
 	local toggle = {}
 	toggle.Type = "Toggle"
 	toggle.Title = toggleData.Title or "Toggle"
+	toggle.Flag = toggleData.Flag
 	toggle.Value = toggleData.Default or false
+	if toggle.Flag and self.ConfigSettings[toggle.Flag] ~= nil then toggle.Value = self.ConfigSettings[toggle.Flag] end
 	toggle.Callback = toggleData.Callback
 	toggle.Connections = {}
 
@@ -562,6 +654,7 @@ function Window:_createToggle(tab, toggleData)
 	function toggle:SetValue(value)
 		toggle.Value = value
 		updateVisual(true)
+		if toggle.Flag then self.ConfigSettings[toggle.Flag] = value end
 		if toggle.Callback then toggle.Callback(toggle.Value) end
 	end
 	function toggle:GetValue()
@@ -588,9 +681,11 @@ function Window:_createSlider(tab, sliderData)
 	local slider = {}
 	slider.Type = "Slider"
 	slider.Title = sliderData.Title or "Slider"
+	slider.Flag = sliderData.Flag
 	slider.Min = sliderData.Min or 0
 	slider.Max = sliderData.Max or 100
 	slider.Value = sliderData.Default or slider.Min
+	if slider.Flag and self.ConfigSettings[slider.Flag] ~= nil then slider.Value = self.ConfigSettings[slider.Flag] end
 	slider.Callback = sliderData.Callback
 	slider.Connections = {}
 
@@ -669,6 +764,7 @@ function Window:_createSlider(tab, sliderData)
 			fill.Size = UDim2.new(fraction, 0, 1, 0)
 			knob.Position = UDim2.new(fraction, 0, 0.5, 0)
 		end
+		if slider.Flag then self.ConfigSettings[slider.Flag] = slider.Value end
 		if slider.Callback then slider.Callback(slider.Value) end
 	end
 
@@ -703,6 +799,7 @@ function Window:_createSlider(tab, sliderData)
 	function slider:SetValue(value)
 		value = math.clamp(value, slider.Min, slider.Max)
 		slider.Value = value
+		if slider.Flag then self.ConfigSettings[slider.Flag] = value end
 		local fraction = (value - slider.Min) / math.max(slider.Max - slider.Min, 1)
 		applyValue(fraction, true)
 	end
@@ -730,8 +827,10 @@ function Window:_createDropdown(tab, dropdownData)
 	local dropdown = {}
 	dropdown.Type = "Dropdown"
 	dropdown.Title = dropdownData.Title or "Dropdown"
+	dropdown.Flag = dropdownData.Flag
 	dropdown.Options = dropdownData.Options or {}
 	dropdown.Value = dropdownData.Default or (dropdownData.Options and dropdownData.Options[1]) or nil
+	if dropdown.Flag and self.ConfigSettings[dropdown.Flag] ~= nil then dropdown.Value = self.ConfigSettings[dropdown.Flag] end
 	dropdown.Callback = dropdownData.Callback
 	dropdown.Connections = {}
 	dropdown.IsOpen = false
@@ -996,6 +1095,7 @@ function Window:_createDropdown(tab, dropdownData)
 	function dropdown:SetValue(value)
 		dropdown.Value = value
 		btn.Text = value
+		if dropdown.Flag then self.ConfigSettings[dropdown.Flag] = value end
 		if dropdown.Callback then dropdown.Callback(value) end
 	end
 	function dropdown:GetValue()
@@ -1315,7 +1415,9 @@ function Window:_createKeybind(tab, keybindData)
 	local keybind = {}
 	keybind.Type = "Keybind"
 	keybind.Title = keybindData.Title or "Keybind"
+	keybind.Flag = keybindData.Flag
 	keybind.Value = keybindData.Default or Enum.KeyCode.L
+	if keybind.Flag and self.ConfigSettings[keybind.Flag] ~= nil then keybind.Value = self.ConfigSettings[keybind.Flag] end
 	keybind.Callback = keybindData.Callback
 	keybind.Connections = {}
 	keybind.IsBinding = false
@@ -1367,6 +1469,7 @@ function Window:_createKeybind(tab, keybindData)
 	function keybind:SetValue(newKey)
 		keybind.Value = newKey
 		btn.Text = newKey.Name
+		if keybind.Flag then self.ConfigSettings[keybind.Flag] = newKey.Name end
 		if keybind.Callback then keybind.Callback(newKey) end
 	end
 	function keybind:GetValue()
@@ -1504,6 +1607,13 @@ function Library:CreateWindow(windowData)
 	})
 
 	local self = setmetatable({}, Window)
+	self.ConfigSettings = {}
+	for k, v in pairs(Library:LoadSettings()) do self.ConfigSettings[k] = v end
+	self.ConfigDropdown = nil
+	self.ConfigNameTextbox = nil
+	self.ConfigAutoloadLabel = nil
+	self.ThemeDropdown = nil
+	self.MenuKeyButton = nil
 	self.ScreenGui = screenGui
 	self.Width = windowData.Width or 560
 	self.Height = windowData.Height or 400
@@ -1771,8 +1881,145 @@ function Library:CreateWindow(windowData)
 	end)
 
 	self:_saveOriginalColors()
+	local al = Library:GetAutoload()
+	if al and al ~= "" then
+		local data = Library:LoadConfig(al)
+		for k, v in pairs(data) do self.ConfigSettings[k] = v end
+	end
+	self:CreateSettingsTab()
 	table.insert(Library.Windows, self)
 	return self
+end
+
+
+-- ==================== CREATE SETTINGS TAB ====================
+function Window:CreateSettingsTab()
+	local self = self
+	local settingsTab = self:_createTab({Title = "Settings"})
+	self.SettingsTab = settingsTab
+
+	local function refreshUI()
+		if self.ConfigDropdown then
+			local names = Library:GetConfigNames()
+			if #names == 0 then
+				self.ConfigDropdown.Button.Text = "No configs"
+			else
+				local cur = self.ConfigDropdown.Button.Text
+				if not table.find(names, cur) then cur = names[1] end
+				self.ConfigDropdown.Button.Text = cur
+			end
+		end
+		local al = Library:GetAutoload()
+		if self.ConfigAutoloadLabel then self.ConfigAutoloadLabel.Text = "Current autoload: " .. (al and al ~= "" and al or "none") end
+	end
+
+	local title = settingsTab:AddLabel({Title = "Configs"})
+	title.TextSize = 16
+	title.FontFace = Font.fromName(Library.Theme.Font, Enum.FontWeight.Bold)
+
+	local nameRow = self:_createRow(settingsTab, "ConfigNameRow")
+	createElement("TextLabel", {Text = "Config Name", Font = Library.Theme.Font, TextSize = 14, TextColor3 = Library.Theme.Text, Size = UDim2.new(0, 90, 1, 0), BackgroundTransparency = 1, BorderSizePixel = 0, TextXAlignment = Enum.TextXAlignment.Left, Parent = nameRow})
+	local nameBox = createElement("TextBox", {Text = "", PlaceholderText = "Enter config name...", Font = Library.Theme.Font, TextSize = 14, TextColor3 = Library.Theme.Text, PlaceholderColor3 = Library.Theme.TextDim, Size = UDim2.new(1, -100, 0, 30), BackgroundColor3 = Library.Theme.Button, BorderSizePixel = 0, TextXAlignment = Enum.TextXAlignment.Left, Parent = nameRow})
+	addCorner(nameBox, {0, 8}); addPadding(nameBox, 0, 0, 8, 8)
+	self.ConfigNameTextbox = nameBox
+
+	local dropdownRow = self:_createRow(settingsTab, "ConfigDropdownRow")
+	createElement("TextLabel", {Text = "Config", Font = Library.Theme.Font, TextSize = 14, TextColor3 = Library.Theme.Text, Size = UDim2.new(0, 100, 1, 0), BackgroundTransparency = 1, BorderSizePixel = 0, TextXAlignment = Enum.TextXAlignment.Left, Parent = dropdownRow})
+	local dropdownBtn = createElement("TextButton", {Text = "No configs", Font = Library.Theme.Font, TextSize = 14, TextColor3 = Library.Theme.Text, Size = UDim2.new(1, -120, 0, 30), BackgroundColor3 = Library.Theme.Button, BorderSizePixel = 0, TextXAlignment = Enum.TextXAlignment.Left, Parent = dropdownRow})
+	addCorner(dropdownBtn, {0, 8}); addPadding(dropdownBtn, 0, 0, 8, 8)
+	self.ConfigDropdown = {Button = dropdownBtn, Row = dropdownRow, Value = nil}
+	dropdownBtn.MouseButton1Click:Connect(function()
+		local names = Library:GetConfigNames()
+		if #names == 0 then dropdownBtn.Text = "No configs" else
+			local cur = dropdownBtn.Text
+			local idx = table.find(names, cur) or 0
+			dropdownBtn.Text = names[(idx % #names) + 1]
+		end
+		refreshUI()
+	end)
+
+	local autoloadLabel = createElement("TextLabel", {Text = "Current autoload: none", Font = Library.Theme.Font, TextSize = 13, TextColor3 = Library.Theme.TextDim, Size = UDim2.new(1, 0, 0, 20), BackgroundTransparency = 1, BorderSizePixel = 0, TextXAlignment = Enum.TextXAlignment.Left, Parent = settingsTab.Container})
+	self.ConfigAutoloadLabel = autoloadLabel
+
+	local themeRow = self:_createRow(settingsTab, "ThemeRow")
+	createElement("TextLabel", {Text = "Theme", Font = Library.Theme.Font, TextSize = 14, TextColor3 = Library.Theme.Text, Size = UDim2.new(0, 100, 1, 0), BackgroundTransparency = 1, BorderSizePixel = 0, TextXAlignment = Enum.TextXAlignment.Left, Parent = themeRow})
+	local themeBtn = createElement("TextButton", {Text = self.ConfigSettings.Theme or "Light", Font = Library.Theme.Font, TextSize = 14, TextColor3 = Library.Theme.Text, Size = UDim2.new(1, -120, 0, 30), BackgroundColor3 = Library.Theme.Button, BorderSizePixel = 0, TextXAlignment = Enum.TextXAlignment.Left, Parent = themeRow})
+	addCorner(themeBtn, {0, 8}); addPadding(themeBtn, 0, 0, 8, 8)
+	self.ThemeDropdown = {Button = themeBtn}
+	themeBtn.MouseButton1Click:Connect(function()
+		local names = {"Light", "Dark", "Forest", "Rose", "Ocean", "Mint", "Lavender", "Coral", "Slate", "Crimson"}
+		local cur = themeBtn.Text
+		local idx = table.find(names, cur) or 0
+		themeBtn.Text = names[(idx % #names) + 1]
+		self.ConfigSettings.Theme = themeBtn.Text
+	end)
+
+	local menuKeyRow = self:_createRow(settingsTab, "MenuKeyRow")
+	createElement("TextLabel", {Text = "Menu Key", Font = Library.Theme.Font, TextSize = 14, TextColor3 = Library.Theme.Text, Size = UDim2.new(0, 100, 1, 0), BackgroundTransparency = 1, BorderSizePixel = 0, TextXAlignment = Enum.TextXAlignment.Left, Parent = menuKeyRow})
+	local menuKeyBtn = createElement("TextButton", {Text = self.ConfigSettings.MenuKey or "L", Font = Library.Theme.Font, TextSize = 14, TextColor3 = Library.Theme.Text, Size = UDim2.new(1, -120, 0, 30), BackgroundColor3 = Library.Theme.Button, BorderSizePixel = 0, TextXAlignment = Enum.TextXAlignment.Left, Parent = menuKeyRow})
+	addCorner(menuKeyBtn, {0, 8}); addPadding(menuKeyBtn, 0, 0, 8, 8)
+	self.MenuKeyButton = {Button = menuKeyBtn}
+	local binding = false
+	local bindConn
+	menuKeyBtn.MouseButton1Click:Connect(function()
+		if binding then return end
+		binding = true
+		menuKeyBtn.Text = "..."
+		if bindConn then bindConn:Disconnect() end
+		bindConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+			if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard then
+				self.ConfigSettings.MenuKey = input.KeyCode.Name
+				menuKeyBtn.Text = input.KeyCode.Name
+				binding = false
+				if bindConn then bindConn:Disconnect(); bindConn = nil end
+			end
+		end)
+	end)
+
+	local buttonRow = self:_createRow(settingsTab, "ButtonRow")
+	local saveBtn = createElement("TextButton", {Text = "Save", Font = Library.Theme.Font, TextSize = 13, TextColor3 = Library.Theme.Text, Size = UDim2.new(0, 65, 0, 28), BackgroundColor3 = Library.Theme.Button, BorderSizePixel = 0, LayoutOrder = 1, Parent = buttonRow})
+	addCorner(saveBtn, {0, 8}); addPadding(saveBtn, 0, 0, 8, 8)
+	local loadBtn = createElement("TextButton", {Text = "Load", Font = Library.Theme.Font, TextSize = 13, TextColor3 = Library.Theme.Text, Size = UDim2.new(0, 65, 0, 28), BackgroundColor3 = Library.Theme.Button, BorderSizePixel = 0, LayoutOrder = 2, Parent = buttonRow})
+	addCorner(loadBtn, {0, 8}); addPadding(loadBtn, 0, 0, 8, 8)
+	local deleteBtn = createElement("TextButton", {Text = "Delete", Font = Library.Theme.Font, TextSize = 13, TextColor3 = Library.Theme.Text, Size = UDim2.new(0, 65, 0, 28), BackgroundColor3 = Library.Theme.Button, BorderSizePixel = 0, LayoutOrder = 3, Parent = buttonRow})
+	addCorner(deleteBtn, {0, 8}); addPadding(deleteBtn, 0, 0, 8, 8)
+	local autoloadBtn = createElement("TextButton", {Text = "Autoload", Font = Library.Theme.Font, TextSize = 11, TextColor3 = Library.Theme.Text, Size = UDim2.new(0, 65, 0, 28), BackgroundColor3 = Library.Theme.Button, BorderSizePixel = 0, LayoutOrder = 4, Parent = buttonRow})
+	addCorner(autoloadBtn, {0, 8}); addPadding(autoloadBtn, 0, 0, 8, 8)
+
+	saveBtn.MouseButton1Click:Connect(function()
+		local name = nameBox.Text
+		if name == "" then saveBtn.Text = "No name"; task.wait(0.8); saveBtn.Text = "Save"; return end
+		Library:SaveConfig(name, self.ConfigSettings)
+		self.ConfigSettings.Config = name
+		refreshUI()
+		saveBtn.Text = "Saved!"; task.wait(1); saveBtn.Text = "Save"
+	end)
+	loadBtn.MouseButton1Click:Connect(function()
+		local name = dropdownBtn.Text
+		if name == "No configs" then loadBtn.Text = "No cfg"; task.wait(0.8); loadBtn.Text = "Load"; return end
+		local data = Library:LoadConfig(name)
+		for k, v in pairs(data) do self.ConfigSettings[k] = v end
+		nameBox.Text = name
+		refreshUI()
+		loadBtn.Text = "Loaded!"; task.wait(1); loadBtn.Text = "Load"
+	end)
+	deleteBtn.MouseButton1Click:Connect(function()
+		local name = dropdownBtn.Text
+		if name == "No configs" then return end
+		Library:DeleteConfig(name)
+		refreshUI()
+		deleteBtn.Text = "Deleted!"; task.wait(1); deleteBtn.Text = "Delete"
+	end)
+	autoloadBtn.MouseButton1Click:Connect(function()
+		local name = dropdownBtn.Text
+		if name == "No configs" then autoloadBtn.Text = "No cfg"; task.wait(0.8); autoloadBtn.Text = "Autoload"; return end
+		Library:SetAutoload(name)
+		refreshUI()
+		autoloadBtn.Text = "Set!"; task.wait(1); autoloadBtn.Text = "Autoload"
+	end)
+
+	refreshUI()
+	return settingsTab
 end
 
 return Library
