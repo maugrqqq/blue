@@ -578,6 +578,7 @@ end
 
 function Window:_createToggle(tab, toggleData)
 	toggleData = toggleData or {}
+	local window = self
 	local toggle = {}
 	toggle.Type = "Toggle"
 	toggle.Title = toggleData.Title or "Toggle"
@@ -655,7 +656,7 @@ function Window:_createToggle(tab, toggleData)
 	function toggle:SetValue(value)
 		toggle.Value = value
 		updateVisual(true)
-		if toggle.Flag then self.ConfigSettings[toggle.Flag] = value end
+		if toggle.Flag then window.ConfigSettings[toggle.Flag] = value end
 		if toggle.Callback then toggle.Callback(toggle.Value) end
 	end
 	function toggle:GetValue()
@@ -674,7 +675,7 @@ function Window:_createToggle(tab, toggleData)
 	end
 
 	if toggle.Flag then
-		self.ElementSetters[toggle.Flag] = function(v)
+		window.ElementSetters[toggle.Flag] = function(v)
 			toggle:SetValue(v)
 		end
 	end
@@ -685,6 +686,7 @@ end
 
 function Window:_createSlider(tab, sliderData)
 	sliderData = sliderData or {}
+	local window = self
 	local slider = {}
 	slider.Type = "Slider"
 	slider.Title = sliderData.Title or "Slider"
@@ -806,7 +808,7 @@ function Window:_createSlider(tab, sliderData)
 	function slider:SetValue(value)
 		value = math.clamp(value, slider.Min, slider.Max)
 		slider.Value = value
-		if slider.Flag then self.ConfigSettings[slider.Flag] = value end
+		if slider.Flag then window.ConfigSettings[slider.Flag] = value end
 		local fraction = (value - slider.Min) / math.max(slider.Max - slider.Min, 1)
 		applyValue(fraction, true)
 	end
@@ -826,7 +828,7 @@ function Window:_createSlider(tab, sliderData)
 	end
 
 	if slider.Flag then
-		self.ElementSetters[slider.Flag] = function(v)
+		window.ElementSetters[slider.Flag] = function(v)
 			slider:SetValue(v)
 		end
 	end
@@ -881,6 +883,7 @@ function Window:_createDropdown(tab, dropdownData)
 	dropdown.Label = label
 	dropdown.Button = btn
 
+		local window = self
 	local function closeDropdown(fast)
 		if not dropdown.DropdownGui then
 			dropdown.IsOpen = false
@@ -1119,7 +1122,7 @@ function Window:_createDropdown(tab, dropdownData)
 	function dropdown:SetValue(value)
 		dropdown.Value = value
 		btn.Text = value
-		if dropdown.Flag then self.ConfigSettings[dropdown.Flag] = value end
+		if dropdown.Flag then window.ConfigSettings[dropdown.Flag] = value end
 		if dropdown.Callback then dropdown.Callback(value) end
 	end
 	function dropdown:GetValue()
@@ -1142,7 +1145,7 @@ function Window:_createDropdown(tab, dropdownData)
 	end
 
 	if dropdown.Flag then
-		self.ElementSetters[dropdown.Flag] = function(v)
+		window.ElementSetters[dropdown.Flag] = function(v)
 			dropdown:SetValue(v)
 		end
 	end
@@ -1442,6 +1445,7 @@ end
 
 function Window:_createKeybind(tab, keybindData)
 	keybindData = keybindData or {}
+	local window = self
 	local keybind = {}
 	keybind.Type = "Keybind"
 	keybind.Title = keybindData.Title or "Keybind"
@@ -1499,7 +1503,7 @@ function Window:_createKeybind(tab, keybindData)
 	function keybind:SetValue(newKey)
 		keybind.Value = newKey
 		btn.Text = newKey.Name
-		if keybind.Flag then self.ConfigSettings[keybind.Flag] = newKey.Name end
+		if keybind.Flag then window.ConfigSettings[keybind.Flag] = newKey.Name end
 		if keybind.Callback then keybind.Callback(newKey) end
 	end
 	function keybind:GetValue()
@@ -1519,7 +1523,7 @@ function Window:_createKeybind(tab, keybindData)
 	end
 
 	if keybind.Flag then
-		self.ElementSetters[keybind.Flag] = function(v)
+		window.ElementSetters[keybind.Flag] = function(v)
 			keybind:SetValue(Enum.KeyCode[v] or Enum.KeyCode.LeftControl)
 		end
 	end
