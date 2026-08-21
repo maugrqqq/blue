@@ -100,17 +100,17 @@ local SettingsFolderName = "UILibrarySettings"
 local ConfigsFolderName = "UILibraryConfigs"
 
 local function getSettingsFolder()
-	local folder = game.ServerStorage:FindFirstChild(SettingsFolderName)
+	local folder = game:GetService("ServerStorage"):FindFirstChild(SettingsFolderName)
 	if not folder then
 		folder = Instance.new("Folder")
 		folder.Name = SettingsFolderName
-		folder.Parent = game.ServerStorage
+		folder.Parent = game:GetService("ServerStorage")
 	end
 	return folder
 end
 
 local function getConfigsFolder()
-	local folder = game.ServerStorage:FindFirstChild(ConfigsFolderName)
+	local folder = game:GetService("ServerStorage"):FindFirstChild(ConfigsFolderName)
 	if not folder then
 		folder = Instance.new("Folder")
 		folder.Name = ConfigsFolderName
